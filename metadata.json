@@ -1,0 +1,6 @@
+{
+  "name": "FreshSave – Smart Food Expiry & Waste Predictor",
+  "description": "Manage your food inventory locally in the browser, track expiry dates, get rule-based waste-reduction recommendations, and find recipes using ingredients on hand.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

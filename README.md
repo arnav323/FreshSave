@@ -1,11 +1,34 @@
-<div align="center">
+# FreshSave – Smart Food Expiry & Waste Predictor
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+FreshSave is a futuristic, cyberpunk-styled, 100% browser-local web application that helps reduce food waste by tracking user-entered groceries, calculating days remaining until expiry, surfacing rule-based consumption priorities, and matching available ingredients against a built-in recipe database.
 
-  <h1>Built with AI Studio</h2>
+**No API keys, no paid APIs, and no external AI services are used.**
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Features
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+- **Futuristic Opening Animation Page**: Animated cyberpunk holographic boot splash with rotating orbital rings, neon laser sweep, progress indicator, and instant skip/replay support.
+- **Zero Pre-Set Items & Optional Expiry Dates**: Starts completely empty with only the groceries you add. Enter an expiry date when you know it, or leave it blank and set it later with one click.
+- **Smart Food Dashboard**: Live counters for Total Food Items, Fresh / Unscheduled Items, Expiring Soon (within 3 days), and Expired Items alongside a neon SVG donut chart and category breakdown chart.
+- **Rule-Based Smart Recommendations**: Local JavaScript rules (explicitly labeled as rule-based logic) rank consumption priority, provide keyword- and category-matched storage tips, and suggest recipes from available ingredients.
+- **Local Recipe Finder**: Toggle ingredients from your inventory, select common staples, or add custom ingredients to match recipes from the built-in recipe database.
+- **LocalStorage Persistence**: All inventory entries are saved automatically in `localStorage`.
 
-</div>
+## How to Run Locally
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+2. **Start the local development server**:
+   ```bash
+   npm run dev
+   ```
+3. **Open in your browser**:
+   Visit `http://localhost:3000`.
+
+### Production Build
+
+```bash
+npm run build
+npm run preview
+```
