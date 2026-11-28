@@ -1,6 +1,16 @@
-import type { ExpiryStatus } from '../types/food';
+import type { ExpiryStatus, FoodCategory } from '../types/food';
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+export const CATEGORY_DEFAULT_EXPIRY_DAYS: Record<FoodCategory, number | null> = {
+  Produce: 5,
+  'Dairy & Eggs': 5,
+  'Meat & Seafood': 2,
+  Bakery: 3,
+  Pantry: null,
+  Beverages: null,
+  Leftovers: 3,
+};
 
 /**
  * Returns today's local calendar date as YYYY-MM-DD.
@@ -41,6 +51,22 @@ export function addDaysISO(baseIso: string, days: number): string {
   const month = String(result.getMonth() + 1).padStart(2, '0');
   const day = String(result.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Calculates an estimated expiry date (YYYY-MM-DD) from category defaults
+ * anchored on purchaseDate (falling back to today if purchaseDate is missing/invalid).
+ * Returns null for categories without an automatic estimate (e.g. Pantry, Beverages).
+ */
+export function getCategoryDefaultExpiryDate(
+  category: FoodCategory,
+  purchaseDate: string,
+  todayIso: string = getTodayISO()
+): string | null {
+  const defaultDays = CATEGORY_DEFAULT_EXPIRY_DAYS[category];
+  if (defaultDays === null) return null;
+  const baseDate = parseLocalISODate(purchaseDate) ? purchaseDate : todayIso;
+  return addDaysISO(baseDate, defaultDays);
 }
 
 /**

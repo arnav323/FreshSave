@@ -152,6 +152,14 @@ export function RecommendationsView({
                     >
                       <Icon className="w-4 h-4" aria-hidden="true" />
                       <span>{formatDaysRemainingLabel(rec.daysRemaining)}</span>
+                      {rec.item.expirySource === 'estimated' && (
+                        <span
+                          title={`Estimated reminder based on ${rec.item.category} default`}
+                          className="text-[10px] font-bold tracking-wider text-amber-300"
+                        >
+                          ESTIMATED
+                        </span>
+                      )}
                     </div>
                   </div>
                 );

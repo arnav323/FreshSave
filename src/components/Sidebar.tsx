@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   BookOpen,
   ChefHat,
   ClipboardList,
@@ -42,6 +43,7 @@ export function Sidebar({
   }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'inventory', label: 'Food Inventory', icon: ClipboardList, count: counts.total },
+    { id: 'analytics', label: 'Waste & Savings Analytics', icon: BarChart3 },
     {
       id: 'recommendations',
       label: 'Smart Recommendations',
@@ -165,7 +167,7 @@ export function Sidebar({
   return (
     <>
       {/* Mobile Compact Header */}
-      <header className="lg:hidden sticky top-0 z-30 bg-[#090C18]/95 backdrop-blur-md border-b border-cyan-400/20 px-4 h-14 flex items-center justify-between gap-4">
+      <header className="no-print lg:hidden sticky top-0 z-30 bg-[#090C18]/95 backdrop-blur-md border-b border-cyan-400/20 px-4 h-14 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <button
             type="button"
@@ -212,7 +214,7 @@ export function Sidebar({
       )}
 
       {/* Desktop Fixed Sidebar */}
-      <aside className="hidden lg:block w-64 shrink-0 border-r border-cyan-400/20 sticky top-0 h-screen">
+      <aside className="no-print hidden lg:block w-64 shrink-0 border-r border-cyan-400/20 sticky top-0 h-screen">
         {navContent}
       </aside>
     </>

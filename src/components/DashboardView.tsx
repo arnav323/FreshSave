@@ -1,6 +1,7 @@
 import {
   AlertOctagon,
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   ChefHat,
   Clock,
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { ExpiryStatus, FoodCategory, FoodItem, NavSection } from '../types/food';
+import { formatINR } from '../utils/analyticsEngine';
 import { formatDaysRemainingLabel, getDaysRemaining, getExpiryStatus } from '../utils/dateUtils';
 import { generateConsumeFirstPlan } from '../utils/recommendationsEngine';
 import { FoodCategoryIcon } from './FoodCategoryIcon';
@@ -19,6 +21,11 @@ export type StatusFilter = 'all' | Exclude<ExpiryStatus, 'no_expiry'>;
 interface DashboardViewProps {
   items: FoodItem[];
   today: string;
+  analyticsPreview?: {
+    moneySaved: number;
+    wastedValue: number;
+    transactionsCount: number;
+  };
   onNavigate: (section: NavSection) => void;
   onFilterInventory: (filter: StatusFilter) => void;
   onAddClick: () => void;
@@ -37,6 +44,7 @@ const ALL_CATEGORIES: FoodCategory[] = [
 export function DashboardView({
   items,
   today,
+  analyticsPreview,
   onNavigate,
   onFilterInventory,
   onAddClick,
@@ -435,6 +443,39 @@ export function DashboardView({
             )}
           </section>
         </>
+      )}
+
+      {/* Waste & Savings Quick Link */}
+      {analyticsPreview && (
+        <section className="bg-[#0D1121]/90 backdrop-blur-sm rounded-xl border border-emerald-400/25 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-400/12 text-emerald-300 shrink-0">
+              <BarChart3 className="w-4 h-4" aria-hidden="true" />
+            </span>
+            <div>
+              <h2 className="text-sm font-bold text-slate-100">Waste &amp; Savings Tracker</h2>
+              <p className="text-xs text-slate-400 mt-0.5 font-mono tabular-nums">
+                Money Saved:{' '}
+                <strong className="text-emerald-300">{formatINR(analyticsPreview.moneySaved)}</strong>
+                {' · '}
+                Food Wasted:{' '}
+                <strong className="text-rose-300">{formatINR(analyticsPreview.wastedValue)}</strong>
+                {' · '}
+                {analyticsPreview.transactionsCount} logged event
+                {analyticsPreview.transactionsCount === 1 ? '' : 's'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onNavigate('analytics')}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition-colors cursor-pointer whitespace-nowrap self-start sm:self-auto"
+          >
+            <span>Open Analytics</span>
+            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+          </button>
+        </section>
       )}
     </motion.div>
   );

@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Undo2 } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
+import { AnalyticsView } from './components/AnalyticsView';
+import { ConsumeModal } from './components/ConsumeModal';
 import { DashboardView, type StatusFilter } from './components/DashboardView';
 import { FoodItemModal, type FoodItemFormValues } from './components/FoodItemModal';
 import { InventoryView, type SortOption } from './components/InventoryView';
@@ -9,9 +11,31 @@ import { RecipeFinderView } from './components/RecipeFinderView';
 import { RecommendationsView } from './components/RecommendationsView';
 import { Sidebar } from './components/Sidebar';
 import { StorageGuideView } from './components/StorageGuideView';
-import type { FoodCategory, FoodItem, NavSection } from './types/food';
+import { WasteModal } from './components/WasteModal';
+import type {
+  EnvFactorConfig,
+  FoodCategory,
+  FoodItem,
+  FoodTransaction,
+  NavSection,
+  PurchaseRecord,
+  WasteGoalsConfig,
+  WasteReason,
+} from './types/food';
+import { computeAnalyticsSummary, formatINR, formatQty } from './utils/analyticsEngine';
 import { formatDateShort, getDaysRemaining, getExpiryStatus, getTodayISO } from './utils/dateUtils';
-import { loadInventory, saveInventory } from './utils/storage';
+import {
+  loadEnvFactors,
+  loadGoalsConfig,
+  loadInventory,
+  loadPurchaseRecords,
+  loadTransactions,
+  saveEnvFactors,
+  saveGoalsConfig,
+  saveInventory,
+  savePurchaseRecords,
+  saveTransactions,
+} from './utils/storage';
 
 const SECTION_TITLES: Record<NavSection, { title: string; subtitle: string }> = {
   dashboard: {
@@ -20,7 +44,11 @@ const SECTION_TITLES: Record<NavSection, { title: string; subtitle: string }> = 
   },
   inventory: {
     title: 'Food Inventory',
-    subtitle: 'Add, search, filter, and manage groceries—expiry dates are optional when unknown.',
+    subtitle: 'Add, search, filter, and log groceries consumed or wasted—expiry dates & prices are optional.',
+  },
+  analytics: {
+    title: 'Waste & Savings Analytics',
+    subtitle: 'Track money saved, food waste losses, environmental impact, and weekly/monthly reports locally.',
   },
   recommendations: {
     title: 'Smart Food Recommendations',
@@ -36,9 +64,23 @@ const SECTION_TITLES: Record<NavSection, { title: string; subtitle: string }> = 
   },
 };
 
+function createId(prefix: string): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [items, setItems] = useState<FoodItem[]>(() => loadInventory());
+  const [transactions, setTransactions] = useState<FoodTransaction[]>(() => loadTransactions());
+  const [purchaseRecords, setPurchaseRecords] = useState<PurchaseRecord[]>(() =>
+    loadPurchaseRecords()
+  );
+  const [envFactors, setEnvFactors] = useState<EnvFactorConfig>(() => loadEnvFactors());
+  const [goalsConfig, setGoalsConfig] = useState<WasteGoalsConfig>(() => loadGoalsConfig());
+
   const [activeSection, setActiveSection] = useState<NavSection>('dashboard');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [categoryFilter, setCategoryFilter] = useState<'All' | FoodCategory>('All');
@@ -48,14 +90,35 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
   const [focusExpiryOnOpen, setFocusExpiryOnOpen] = useState(false);
+  const [consumingItem, setConsumingItem] = useState<FoodItem | null>(null);
+  const [wastingItem, setWastingItem] = useState<FoodItem | null>(null);
+
   const [lastDeleted, setLastDeleted] = useState<FoodItem | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  const lastTxGuardRef = useRef<{ key: string; at: number } | null>(null);
 
   const today = getTodayISO();
 
   useEffect(() => {
     saveInventory(items);
   }, [items]);
+
+  useEffect(() => {
+    saveTransactions(transactions);
+  }, [transactions]);
+
+  useEffect(() => {
+    savePurchaseRecords(purchaseRecords);
+  }, [purchaseRecords]);
+
+  useEffect(() => {
+    saveEnvFactors(envFactors);
+  }, [envFactors]);
+
+  useEffect(() => {
+    saveGoalsConfig(goalsConfig);
+  }, [goalsConfig]);
 
   useEffect(() => {
     if (!lastDeleted) return;
@@ -86,6 +149,19 @@ export default function App() {
     { total: 0, fresh: 0, expiringSoon: 0, expired: 0 }
   );
 
+  const allTimeSummary = useMemo(
+    () =>
+      computeAnalyticsSummary(
+        items,
+        transactions,
+        purchaseRecords,
+        envFactors,
+        'all_time',
+        today
+      ),
+    [items, transactions, purchaseRecords, envFactors, today]
+  );
+
   const handleOpenAdd = () => {
     setEditingItem(null);
     setFocusExpiryOnOpen(false);
@@ -96,6 +172,26 @@ export default function App() {
     setEditingItem(item);
     setFocusExpiryOnOpen(focusExpiry);
     setModalOpen(true);
+  };
+
+  const syncPurchaseRecord = (itemId: string, values: FoodItemFormValues) => {
+    setPurchaseRecords((prev) => {
+      const filtered = prev.filter((r) => r.groceryId !== itemId);
+      if (values.purchasePrice === null || values.purchasePrice === undefined) {
+        return filtered;
+      }
+      const nextRecord: PurchaseRecord = {
+        groceryId: itemId,
+        groceryName: values.name,
+        category: values.category,
+        purchaseDate: values.purchaseDate,
+        quantityPurchased: values.initialQuantity,
+        unit: values.unit,
+        totalPurchaseCost: values.purchasePrice,
+        pricePerUnit: values.pricePerUnit ?? 0,
+      };
+      return [nextRecord, ...filtered];
+    });
   };
 
   const handleSaveItem = (values: FoodItemFormValues, existingId?: string) => {
@@ -110,17 +206,17 @@ export default function App() {
             : item
         )
       );
+      syncPurchaseRecord(existingId, values);
       setNotice(`Updated "${values.name}".`);
     } else {
+      const newId = createId('item');
       const newItem: FoodItem = {
-        id:
-          typeof crypto !== 'undefined' && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        id: newId,
         ...values,
         createdAt: Date.now(),
       };
       setItems((prev) => [newItem, ...prev]);
+      syncPurchaseRecord(newId, values);
       setNotice(`Added "${values.name}" to inventory.`);
     }
     setModalOpen(false);
@@ -137,6 +233,127 @@ export default function App() {
     if (!lastDeleted) return;
     setItems((prev) => [lastDeleted, ...prev]);
     setLastDeleted(null);
+  };
+
+  const applyInventoryDeduction = (itemId: string, deductedQty: number) => {
+    setItems((prev) =>
+      prev.flatMap((entry) => {
+        if (entry.id !== itemId) return [entry];
+        const remaining = Math.round((entry.quantity - deductedQty) * 100) / 100;
+        if (remaining <= 0.0001) {
+          return [];
+        }
+        return [{ ...entry, quantity: remaining }];
+      })
+    );
+  };
+
+  const handleConfirmConsume = (item: FoodItem, consumedQty: number) => {
+    const guardKey = `consumed:${item.id}`;
+    const now = Date.now();
+    if (
+      lastTxGuardRef.current &&
+      lastTxGuardRef.current.key === guardKey &&
+      now - lastTxGuardRef.current.at < 1500
+    ) {
+      return;
+    }
+    lastTxGuardRef.current = { key: guardKey, at: now };
+
+    const safeQty = Math.min(item.quantity, Math.max(0.01, consumedQty));
+    const daysRemaining = getDaysRemaining(item.expiryDate, today);
+    const wasApproachingExpiry =
+      daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= 3;
+
+    const unitPrice =
+      typeof item.pricePerUnit === 'number' && Number.isFinite(item.pricePerUnit)
+        ? item.pricePerUnit
+        : null;
+    const estValue =
+      unitPrice !== null ? Math.round(safeQty * unitPrice * 100) / 100 : null;
+
+    const tx: FoodTransaction = {
+      transactionId: createId('tx'),
+      groceryId: item.id,
+      groceryName: item.name,
+      category: item.category,
+      transactionType: 'consumed',
+      quantity: safeQty,
+      unit: item.unit,
+      recordedPurchasePrice: unitPrice,
+      estimatedMonetaryValue: estValue,
+      dateTime: new Date().toISOString(),
+      dateISO: today,
+      daysRemainingAtEvent: daysRemaining,
+      wasApproachingExpiry,
+    };
+
+    setTransactions((prev) => [tx, ...prev]);
+    applyInventoryDeduction(item.id, safeQty);
+    setConsumingItem(null);
+
+    const savedSuffix =
+      estValue !== null && (daysRemaining === null || daysRemaining >= 0)
+        ? ` (${formatINR(estValue)} saved)`
+        : '';
+    setNotice(`Logged ${formatQty(safeQty)} ${item.unit} of "${item.name}" consumed${savedSuffix}.`);
+  };
+
+  const handleConfirmWaste = (
+    item: FoodItem,
+    wastedQty: number,
+    reason: WasteReason,
+    reasonNote?: string
+  ) => {
+    const guardKey = `wasted:${item.id}`;
+    const now = Date.now();
+    if (
+      lastTxGuardRef.current &&
+      lastTxGuardRef.current.key === guardKey &&
+      now - lastTxGuardRef.current.at < 1500
+    ) {
+      return;
+    }
+    lastTxGuardRef.current = { key: guardKey, at: now };
+
+    const safeQty = Math.min(item.quantity, Math.max(0.01, wastedQty));
+    const daysRemaining = getDaysRemaining(item.expiryDate, today);
+
+    const unitPrice =
+      typeof item.pricePerUnit === 'number' && Number.isFinite(item.pricePerUnit)
+        ? item.pricePerUnit
+        : null;
+    const estValue =
+      unitPrice !== null ? Math.round(safeQty * unitPrice * 100) / 100 : null;
+
+    const tx: FoodTransaction = {
+      transactionId: createId('tx'),
+      groceryId: item.id,
+      groceryName: item.name,
+      category: item.category,
+      transactionType: 'wasted',
+      quantity: safeQty,
+      unit: item.unit,
+      recordedPurchasePrice: unitPrice,
+      estimatedMonetaryValue: estValue,
+      dateTime: new Date().toISOString(),
+      dateISO: today,
+      daysRemainingAtEvent: daysRemaining,
+      reason,
+      reasonNote,
+    };
+
+    setTransactions((prev) => [tx, ...prev]);
+    applyInventoryDeduction(item.id, safeQty);
+    setWastingItem(null);
+
+    const lossSuffix = estValue !== null ? ` (${formatINR(estValue)} loss recorded)` : '';
+    setNotice(`Logged ${formatQty(safeQty)} ${item.unit} of "${item.name}" wasted${lossSuffix}.`);
+  };
+
+  const handleClearHistory = () => {
+    setTransactions([]);
+    setNotice('Cleared consumption and waste history.');
   };
 
   const handleFilterInventoryFromDashboard = (filter: StatusFilter) => {
@@ -184,6 +401,11 @@ export default function App() {
             <DashboardView
               items={items}
               today={today}
+              analyticsPreview={{
+                moneySaved: allTimeSummary.totalMoneySaved,
+                wastedValue: allTimeSummary.totalFoodWastedValue,
+                transactionsCount: transactions.length,
+              }}
               onNavigate={setActiveSection}
               onFilterInventory={handleFilterInventoryFromDashboard}
               onAddClick={handleOpenAdd}
@@ -204,7 +426,29 @@ export default function App() {
               onSortByChange={setSortBy}
               onEditItem={handleOpenEdit}
               onDeleteItem={handleDeleteItem}
+              onConsumeItem={(item) => setConsumingItem(item)}
+              onWasteItem={(item) => setWastingItem(item)}
               onAddClick={handleOpenAdd}
+            />
+          )}
+
+          {activeSection === 'analytics' && (
+            <AnalyticsView
+              items={items}
+              transactions={transactions}
+              purchaseRecords={purchaseRecords}
+              envFactors={envFactors}
+              onUpdateEnvFactors={(next) => {
+                setEnvFactors(next);
+                setNotice('Saved environmental estimation factors.');
+              }}
+              goalsConfig={goalsConfig}
+              onUpdateGoalsConfig={(next) => {
+                setGoalsConfig(next);
+                setNotice('Updated waste reduction goals.');
+              }}
+              onClearHistory={handleClearHistory}
+              today={today}
             />
           )}
 
@@ -224,7 +468,7 @@ export default function App() {
           {activeSection === 'storage' && <StorageGuideView />}
         </main>
 
-        <footer className="border-t border-cyan-400/15 bg-[#090C18]/80 py-4 mt-8">
+        <footer className="no-print border-t border-cyan-400/15 bg-[#090C18]/80 py-4 mt-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
             <span>FreshSave · Smart Food Expiry &amp; Waste Predictor</span>
             <span>Works 100% locally in your browser · No API key required</span>
@@ -245,12 +489,28 @@ export default function App() {
         onSave={handleSaveItem}
       />
 
+      {/* Mark as Consumed Modal */}
+      <ConsumeModal
+        item={consumingItem}
+        today={today}
+        onClose={() => setConsumingItem(null)}
+        onConfirm={handleConfirmConsume}
+      />
+
+      {/* Mark as Wasted Modal */}
+      <WasteModal
+        item={wastingItem}
+        today={today}
+        onClose={() => setWastingItem(null)}
+        onConfirm={handleConfirmWaste}
+      />
+
       {/* Undo Delete Toast */}
       {lastDeleted && (
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#11162B] border border-cyan-400/35 text-slate-100 text-sm shadow-[0_0_24px_rgba(34,211,238,0.2)]"
+          className="no-print fixed bottom-5 right-5 z-40 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#11162B] border border-cyan-400/35 text-slate-100 text-sm shadow-[0_0_24px_rgba(34,211,238,0.2)]"
         >
           <span>Removed &ldquo;{lastDeleted.name}&rdquo;</span>
           <button
@@ -269,7 +529,7 @@ export default function App() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-5 right-5 z-40 px-4 py-3 rounded-xl bg-cyan-400 text-slate-950 font-semibold text-sm shadow-[0_0_24px_rgba(34,211,238,0.3)]"
+          className="no-print fixed bottom-5 right-5 z-40 px-4 py-3 rounded-xl bg-cyan-400 text-slate-950 font-semibold text-sm shadow-[0_0_24px_rgba(34,211,238,0.3)]"
         >
           {notice}
         </div>
