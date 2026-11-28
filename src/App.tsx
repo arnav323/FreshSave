@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Undo2 } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
+import { AdminPage } from './components/AdminPage';
 import { AnalyticsView } from './components/AnalyticsView';
 import { ConsumeModal } from './components/ConsumeModal';
 import { DashboardView, type StatusFilter } from './components/DashboardView';
@@ -72,6 +73,9 @@ function createId(prefix: string): string {
 }
 
 export default function App() {
+  const [pathname, setPathname] = useState(() =>
+    typeof window !== 'undefined' ? window.location.pathname : '/'
+  );
   const [showSplash, setShowSplash] = useState(true);
   const [items, setItems] = useState<FoodItem[]>(() => loadInventory());
   const [transactions, setTransactions] = useState<FoodTransaction[]>(() => loadTransactions());
@@ -99,6 +103,22 @@ export default function App() {
   const lastTxGuardRef = useRef<{ key: string; at: number } | null>(null);
 
   const today = getTodayISO();
+  const isAdminRoute = pathname === '/admin' || pathname === '/admin/';
+
+  const navigateTo = useCallback((path: string) => {
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
+    setPathname(path);
+  }, []);
+
+  useEffect(() => {
+    const onPopState = () => {
+      setPathname(window.location.pathname);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   useEffect(() => {
     saveInventory(items);
@@ -363,6 +383,10 @@ export default function App() {
 
   const headerInfo = SECTION_TITLES[activeSection];
 
+  if (isAdminRoute) {
+    return <AdminPage onNavigateHome={() => navigateTo('/')} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row cyber-backdrop text-slate-100">
       <AnimatePresence>
@@ -374,6 +398,7 @@ export default function App() {
         onSelectSection={setActiveSection}
         onAddClick={handleOpenAdd}
         onReplayIntro={() => setShowSplash(true)}
+        onOpenAdmin={() => navigateTo('/admin')}
         counts={{
           total: counts.total,
           expiringSoon: counts.expiringSoon,
