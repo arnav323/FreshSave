@@ -2,11 +2,11 @@
 
 **Track Your Food. Beat Expiry. Save Money. Reduce Waste.**
 
-FreshSave is a futuristic, browser-based food management and waste-prevention platform designed to help users manage their groceries, monitor food expiry dates, reduce household food waste, and save money.
+FreshSave is a futuristic, browser-based food management and waste-prevention platform designed to help users manage groceries, monitor food expiry dates, reduce household food waste, and save money.
 
-It brings grocery inventory management, intelligent expiry tracking, food consumption monitoring, financial analytics, and personalized food recommendations together in one place.
+It brings grocery inventory management, expiry tracking, food consumption monitoring, financial analytics, personalized recommendations, and an admin dashboard together in one place.
 
-Built with a cyberpunk-inspired interface and a privacy-first, browser-local architecture, FreshSave works without API keys, external AI services, or backend dependencies.
+Built with a cyberpunk-inspired interface and a browser-local architecture, FreshSave works without API keys, external AI services, or backend dependencies in the current demo version.
 
 ---
 
@@ -22,8 +22,6 @@ Traditional grocery lists help people remember what to buy, but they don't neces
 
 Instead of simply storing grocery information, FreshSave transforms it into useful insights that help users make smarter decisions about their food.
 
-Our goal is simple:
-
 > Make food waste visible, make food management smarter, and make responsible consumption easier.
 
 ---
@@ -31,25 +29,27 @@ Our goal is simple:
 ## ✨ Key Features
 
 ### 1. 🚀 Futuristic Cyberpunk Interface
-- Animated cyberpunk boot-up introduction.
-- Holographic rings, neon scanlines, and loading animations.
-- Skip and replay intro functionality.
-- Dark-themed neon dashboard.
-- Responsive desktop sidebar and mobile navigation.
-- Smooth transitions and interactive UI elements.
+
+- Animated cyberpunk boot-up introduction
+- Holographic rings, neon scanlines, and loading animations
+- Skip and replay intro functionality
+- Dark-themed neon dashboard
+- Responsive desktop sidebar and mobile navigation
+- Smooth transitions and interactive UI elements
 
 ### 2. 🛒 Smart Grocery Inventory Management
-- Add, edit, and delete grocery items.
-- Starts with a completely empty inventory.
-- Store grocery name, category, quantity, unit, and purchase date.
-- Optional expiry dates.
-- Search, filter, and sort groceries.
-- Undo deletion functionality.
-- Automatic browser-based data persistence.
+
+- Add, edit, and delete grocery items
+- Starts with a completely empty inventory
+- Store grocery name, category, quantity, unit, and purchase date
+- Optional expiry dates
+- Search, filter, and sort groceries
+- Undo deletion functionality
+- Browser-based data persistence
 
 ### 3. ⏳ Intelligent Expiry Date Tracking
 
-FreshSave automatically monitors grocery expiry dates and calculates the remaining shelf-life days.
+FreshSave monitors grocery expiry dates and calculates the remaining shelf-life days.
 
 It also provides category-based estimated expiry suggestions when users don't provide an expiry date.
 
@@ -66,6 +66,7 @@ It also provides category-based estimated expiry suggestions when users don't pr
 Users can manually override or remove estimated expiry dates.
 
 **Color-coded expiry statuses:**
+
 - 🟢 Emerald – Fresh
 - 🟡 Amber – Expiring Soon
 - 🔴 Crimson – Expired
@@ -74,37 +75,41 @@ Users can manually override or remove estimated expiry dates.
 *Category-based dates are reminders, not guaranteed food-safety or manufacturer-confirmed expiry dates.*
 
 ### 4. 📊 Smart Food Dashboard
-- Total grocery count.
-- Fresh and unscheduled items.
-- Expiring soon alerts.
-- Expired item alerts.
-- Live expiry breakdown donut chart.
-- Category distribution chart.
-- Quick list of groceries requiring attention.
+
+- Total grocery count
+- Fresh and unscheduled items
+- Expiring soon alerts
+- Expired item alerts
+- Live expiry breakdown donut chart
+- Category distribution chart
+- Quick list of groceries requiring attention
 
 ### 5. 💰 Grocery Purchase Price Tracking
-- Optionally record grocery purchase prices in INR (₹).
-- Track purchase quantities and total costs.
-- Automatically calculate price per unit.
-- Estimate the remaining monetary value of inventory.
-- Handle groceries without recorded prices.
+
+- Optionally record grocery purchase prices in INR (₹)
+- Track purchase quantities and total costs
+- Calculate price per unit
+- Estimate the remaining monetary value of inventory
+- Handle groceries without recorded prices
 
 ### 6. ♻️ Food Consumption & Waste Tracking
 
 Track what happens to groceries after purchasing them.
 
 **Consumption Tracking:**
-- Mark groceries as consumed.
-- Record full or partial quantities.
-- Calculate estimated consumption value.
-- Maintain consumption history.
+
+- Mark groceries as consumed
+- Record full or partial quantities
+- Calculate estimated consumption value
+- Maintain consumption history
 
 **Food Waste Tracking:**
-- Mark groceries as wasted.
-- Record partial or full wasted quantities.
-- Select reasons such as expired, spoiled, forgotten, or over-purchased.
-- Calculate estimated financial losses.
-- Maintain a separate waste history.
+
+- Mark groceries as wasted
+- Record partial or full wasted quantities
+- Select reasons such as expired, spoiled, forgotten, or over-purchased
+- Calculate estimated financial losses
+- Maintain a separate waste history
 
 Expired groceries are not automatically classified as wasted. Users explicitly record actual food waste.
 
@@ -113,61 +118,79 @@ Expired groceries are not automatically classified as wasted. Users explicitly r
 Understand the financial and environmental impact of grocery habits.
 
 **Financial Analytics:**
-- Total Money Saved.
-- Food Wasted.
-- Food Waste Prevented.
-- Total Food Consumed.
-- Total grocery spending.
-- Estimated financial losses.
-- Current inventory value.
-- Upcoming expiry value at risk.
+
+- Total Money Saved
+- Food Wasted
+- Food Waste Prevented
+- Total Food Consumed
+- Total grocery spending
+- Estimated financial losses
+- Current inventory value
+- Upcoming expiry value at risk
 
 **Interactive Visualizations:**
-- Food waste breakdown donut chart.
-- Monthly waste trends.
-- Spending versus waste comparison.
-- Waste by food category.
+
+- Food waste breakdown donut chart
+- Monthly waste trends
+- Spending versus waste comparison
+- Waste by food category
 
 **Additional Insights:**
-- Weekly and monthly reports.
-- Date-based analytics filters.
-- CSV export and printable reports.
-- Environmental impact estimates.
-- Estimated CO₂-equivalent emissions avoided.
-- Rule-based personalized waste insights.
-- Waste-reduction goals.
-- Achievement badges and streaks.
+
+- Weekly and monthly reports
+- Date-based analytics filters
+- CSV export and printable reports
+- Environmental impact estimates
+- Estimated CO₂-equivalent emissions avoided
+- Rule-based personalized waste insights
+- Waste-reduction goals
+- Achievement badges and streaks
 
 ### 8. 🧠 Rule-Based Smart Recommendations
 
 FreshSave uses local JavaScript rules to generate useful food-management recommendations.
 
-- Identify which groceries should be consumed first.
-- Prioritize items approaching expiry.
-- Warn users about expired groceries.
-- Provide food-specific storage recommendations.
-- Highlight opportunities to prevent food waste.
+- Identify groceries that should be consumed first
+- Prioritize items approaching expiry
+- Warn users about expired groceries
+- Provide food-specific storage recommendations
+- Highlight opportunities to prevent food waste
 
 No external AI service is required.
 
 ### 9. 🍳 Local Recipe Finder
-- Built-in recipe database.
-- Match recipes against available grocery ingredients.
-- Identify recipes using ingredients approaching expiry.
-- Help users discover meals using groceries they already own.
+
+- Built-in recipe database
+- Match recipes against available grocery ingredients
+- Identify recipes using ingredients approaching expiry
+- Help users discover meals using groceries they already own
 
 ### 10. 🧊 Food Storage Guide
-- Food-specific storage recommendations.
-- Refrigerator storage guidance.
-- Freezing recommendations.
-- Food date-label information.
-- Practical tips to help extend food shelf life.
+
+- Food-specific storage recommendations
+- Refrigerator storage guidance
+- Freezing recommendations
+- Food date-label information
+- Practical tips to help extend food shelf life
+
+### 11. 🛠️ Admin Dashboard
+
+FreshSave includes an Admin Dashboard designed to provide an overview of available application data.
+
+- View grocery inventory statistics
+- Monitor consumption and food waste data where available
+- View savings-related statistics where tracked
+- Review category breakdowns and activity
+- Refresh dashboard data
+- Reads data from the same browser's LocalStorage in the current demo
+
+The current dashboard is a working local prototype. Centralized collection and cross-user analytics are planned future improvements.
 
 ---
 
 ## ⚙️ Technology & Architecture
 
-FreshSave is designed around a lightweight, browser-local architecture.
+FreshSave currently uses a lightweight, browser-local architecture.
 
 | Technology / Component | Purpose |
 |---|---|
@@ -176,25 +199,24 @@ FreshSave is designed around a lightweight, browser-local architecture.
 | JavaScript | Application logic and interactions |
 | Browser LocalStorage | Local data persistence |
 | JavaScript Date API | Expiry-date calculations |
-| JavaScript rule engine | Recommendations and recipe matching |
-| Charting components | Dashboard and analytics visualizations |
-
-*The table describes the application architecture and intended technology roles. Adapt the technology list if your actual implementation uses a framework or additional libraries.*
+| JavaScript rule logic | Recommendations and recipe matching |
+| Charting components | Dashboard and analytics visualizations, where used |
 
 ### 🔒 Privacy-First & Browser-Local
 
-One of FreshSave's key design decisions is its local-first architecture.
+The current demo is local-first:
 
-- No backend server required.
-- No API keys required.
-- No external AI dependencies.
-- Grocery information is stored in browser LocalStorage.
-- Core features operate without external services.
-- No mandatory account registration.
+- No backend server required
+- No API keys required
+- No external AI dependencies
+- Grocery information is stored in browser LocalStorage
+- Core features operate without external services
+- No mandatory account registration
+- Admin Dashboard reads the browser's locally stored FreshSave data
 
-**Your grocery inventory stays in your browser.**
+**The current Admin Dashboard does not display global user data.** It can only read data available in the same browser's storage.
 
-Note: LocalStorage data is tied to the browser and device. Clearing browser data can remove saved information.
+LocalStorage is tied to the browser and device. Clearing browser data can remove saved information. Data is not automatically shared between different browsers, devices, or users.
 
 ---
 
@@ -202,9 +224,9 @@ Note: LocalStorage data is tied to the browser and device. Clearing browser data
 
 ### Prerequisites
 
-- A modern web browser.
-- A code editor such as Visual Studio Code.
-- The project source code.
+- A modern web browser
+- A code editor such as Visual Studio Code
+- The project source code
 
 ### Installation
 
@@ -224,13 +246,16 @@ Note: LocalStorage data is tied to the browser and device. Clearing browser data
 
 4. Run the application using the development or preview method configured by your project.
 
-   If it is a standalone HTML application, open its `index.html` file in a browser.
+   - If it is a standalone HTML application, open its `index.html` file in a browser.
+   - If it uses a development framework, follow the commands specified in its `package.json`.
 
-   If it uses a development framework, follow the commands specified in its `package.json`.
+5. Start adding groceries and explore FreshSave.
 
-5. Start adding groceries and explore FreshSave!
+6. Open the Admin Dashboard from the website or visit `/admin` on the same site to view locally stored demo data.
 
-Or Use this link to open: https://freshsave-ten.vercel.app/
+### 🌐 Live Demo
+
+[https://freshsave-ten.vercel.app/](https://freshsave-ten.vercel.app/)
 
 ---
 
@@ -245,6 +270,7 @@ The application follows a simple food-management workflow:
 5. **Record:** Track consumed and wasted food.
 6. **Analyze:** Understand financial losses, savings, and food-waste patterns.
 7. **Improve:** Make smarter grocery purchasing and consumption decisions.
+8. **Review:** Use the demo Admin Dashboard to inspect data available in the same browser.
 
 ---
 
@@ -252,7 +278,7 @@ The application follows a simple food-management workflow:
 
 FreshSave has the potential to evolve into a more advanced food intelligence ecosystem.
 
-Some planned enhancements include:
+Potential future enhancements include:
 
 - **Barcode Scanning:** Scan grocery products to simplify inventory entry.
 - **AI Food Recognition:** Identify food items through camera-based image recognition.
@@ -260,6 +286,7 @@ Some planned enhancements include:
 - **Smart Fridge Visualization:** Interactive refrigerator compartments for organizing groceries.
 - **Advanced Waste Prediction:** Analyze historical consumption patterns to identify frequently wasted foods.
 - **Cloud Synchronization:** Optional household inventory sharing across devices.
+- **Centralized Admin Analytics:** Collect application data through a backend/API and provide aggregated statistics across users.
 - **Community Food Sharing:** Help users discover opportunities to responsibly redistribute surplus food.
 
 ---
@@ -280,21 +307,20 @@ We want to help them understand what to do with it before it goes to waste.
 
 ## 👨‍💻 Project Information
 
-**Project Name:** FreshSave 
-
-**Project Category:** Sustainability / Food Technology / Productivity
-
-**Architecture:** Browser-local web application
-
-**Data Storage:** Browser LocalStorage
-
-**External API Dependency:** None
-
-**Built for:** PROMPTWARS × AI VIBEATHON 2026
+| | |
+|---|---|
+| **Project Name** | FreshSave |
+| **Project Category** | Sustainability / Food Technology / Productivity |
+| **Architecture** | Browser-local web application |
+| **Data Storage** | Browser LocalStorage |
+| **Admin Dashboard** | Local demo dashboard reading browser data |
+| **Backend / API** | Not used in the current demo version |
+| **Built for** | PROMPTWARS × AI VIBEATHON 2026 |
 
 ---
 
+<p align="center">
 
-FreshSave aims to help people recognize that value and make better use of the food they already have.
+### 🥬 Less Waste. More Savings. Smarter Living.
 
-**Let's make every grocery count. 🌱**
+</p>
